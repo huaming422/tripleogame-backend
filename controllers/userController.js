@@ -21,7 +21,7 @@ const { RegisterEmail, ResetPasswordEmail } = require("../mail/registerMail");
 
 let auth = new AppleAuth(
   config,
-  fs.readFileSync("../config/AuthKey.p8").toString(),
+  // fs.readFileSync("../config/AuthKey.p8").toString(),
   "text"
 );
 
