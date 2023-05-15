@@ -8,7 +8,8 @@ const Config = require("../config/config");
 const { comparePasswords } = require("../shared/utils");
 
 // ** Model
-const User = require("../models/UserModel");
+const User = require("../models/User");
+const Visitor = require("../models/VisitorHistory");
 
 module.exports.UserLogin = async function (user, password) {
   if (user.type === "email") {
@@ -80,6 +81,34 @@ module.exports.UserCreate = async function (req) {
     user.isVerified = true;
     const result = await user.save();
     return result;
+  }
+};
+
+module.exports.VisitorCreate = async function () {
+  const currentTime = new Date();
+  let year = currentTime.getFullYear();
+  let month = currentTime.getMonth();
+  let day = currentTime.getDate();
+  const date = new Date(year, month, day);
+  const visitor = await Visitor.exists({ date });
+  const filter = { date: date };
+  if (visitor) {
+    const result = await Visitor.findOneAndUpdate(
+      filter,
+      { $inc: { count: 1 } },
+      {
+        new: true,
+      }
+    );
+
+    if (result) {
+      return result;
+    }
+  } else {
+    const result = await Visitor.create({ date, count: 1 });
+    if (result) {
+      return result;
+    }
   }
 };
 
@@ -161,4 +190,24 @@ module.exports.ResetPassword = async function (id, pwd) {
     return result;
   }
   return false;
+};
+
+module.exports.GetAllVisitor = async function (req) {
+  const period = req.body.period;
+  var startDate = new Date();
+  startDate.setDate(startDate.getDate() - period);
+  console.log(startDate.toString());
+  var endDate = new Date();
+  console.log(endDate.toString());
+  const result = await Visitor.find({
+    date: {
+      $gt: startDate,
+      $lt: endDate,
+    },
+  }).exec();
+
+  if (result) {
+    return result;
+  }
+  return null;
 };

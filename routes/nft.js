@@ -1,36 +1,22 @@
 let express = require("express");
 var router = express.Router();
 
-// ** middleware
-const Authenticate = require("../middleware/authenticate");
-
 let nftMarketController = require("../controllers/nftMarketController");
 
-/**
- * @swagger
- * /get-userinfo:
- *   post:
- *     tags: ["Profile"]
- *     summary: "get user info"
- *     produces: ["application/json"]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *         required: true
- *         content:
- *           application/json:
- *
- *     responses:
- *       200:
- *         description: Success
- *       400:
- *         description: Bad Request
- *       401:
- *         description: Unauthorized
- *       500:
- *         description: Sever Error
- * */
+router.post("/like_nft", nftMarketController.likeNFT);
 
-router.post("/list", Authenticate, nftMarketController.listNFT);
+router.post("/unLike_nft", nftMarketController.unLikeNFT);
+
+router.post("/get_likedNFTs", nftMarketController.getLikedNFTsOfUser);
+
+router.post("/mintNFT", nftMarketController.mintNFT);
+
+router.post("/get_mint_history", nftMarketController.getAllMint);
+
+router.post("/soldNFT", nftMarketController.soldNFT);
+
+router.post("/get_sold_history", nftMarketController.getAllSold);
+
+router.post("/get_save_history", nftMarketController.getAllSave);
 
 module.exports = router;

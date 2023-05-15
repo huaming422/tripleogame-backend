@@ -15,12 +15,6 @@ const UserSchema = new Schema(
       minlength: 3,
       maxlength: 50,
     },
-    username: {
-      type: String,
-      required: false,
-      minlength: 3,
-      maxlength: 50,
-    },
     email: {
       type: String,
       required: true,
@@ -38,16 +32,17 @@ const UserSchema = new Schema(
       minlength: 5,
       maxlength: 1024,
     },
-    type: {
-      type: String,
-      default: "email",
-    },
     role: {
       type: String,
       required: true,
-      default: "admin",
+      default: "user",
     },
     isVerified: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    isPhoneVerified: {
       type: Boolean,
       required: true,
       default: false,
@@ -55,28 +50,14 @@ const UserSchema = new Schema(
     avatar: {
       type: String,
     },
-    linkedinurl: {
+    os: {
       type: String,
-      minlength: 3,
-      maxlength: 50,
     },
-    description: {
+    browser: {
       type: String,
-      minlength: 3,
-      maxlength: 50,
     },
-    employment: {
-      type: Object,
-    },
-    language: {
-      type: Object,
-    },
-    address: {
-      type: Object,
-    },
-    googleId: {
-      type: Number,
-      required: false,
+    location: {
+      type: String,
     },
   },
   {

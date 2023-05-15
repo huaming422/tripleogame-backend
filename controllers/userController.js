@@ -7,7 +7,10 @@ const {
   GetUserByEmail,
   VerifyEmail,
   ResetPassword,
+  VisitorCreate,
+  GetAllVisitor,
 } = require("../services/userService");
+const { generateNonce, ErrorTypes, SiweMessage } = require("siwe");
 const AppleAuth = require("apple-auth");
 // const { OAuth2Client } = require("google-auth-library");
 const fs = require("fs");
@@ -51,7 +54,7 @@ module.exports = {
           return res.status(200).json({
             success: true,
             token: token,
-            data: await GetUserById(validateUser?._id),
+            data: await GetUserById(validateUser._id),
             message: "You have successfully logged in!",
           });
         } else {
@@ -91,7 +94,7 @@ module.exports = {
                   return res.status(200).json({
                     success: true,
                     token: sessionToken,
-                    data: await GetUserById(user?._id),
+                    data: await GetUserById(user._id),
                     message: "You have successfully logged in!",
                   });
                 } else {
@@ -110,7 +113,7 @@ module.exports = {
               return res.status(200).json({
                 success: true,
                 token: sessionToken,
-                data: await GetUserById(validateUser?._id),
+                data: await GetUserById(validateUser._id),
                 message: "You have successfully logged in!",
               });
             } else {
@@ -159,7 +162,7 @@ module.exports = {
           return res.status(200).json({
             success: true,
             token: token,
-            data: await GetUserById(user?._id),
+            data: await GetUserById(user._id),
             message: "You have successfully logged in!",
           });
         } else {
@@ -220,15 +223,22 @@ module.exports = {
     }
   },
   resendEmail: async function (req, res) {
-    const { id } = req.params;
+    const { email } = req.body;
     try {
-      const user = await GetUserById(id);
-      if (user) {
-        await RegisterEmail(user);
-        return res.status(200).json({
-          success: true,
-          message: "Email resend successfully!",
-        });
+      if (email) {
+        const user = await ValidateEmail(email);
+        if (!user) {
+          return res.status(203).send({
+            success: false,
+            notExit: "Email does not exist!",
+          });
+        } else {
+          await RegisterEmail(user);
+          return res.status(200).json({
+            success: true,
+            message: "Email resend successfully!",
+          });
+        }
       }
     } catch (error) {
       res.status(500).send({
@@ -270,6 +280,78 @@ module.exports = {
       res.status(500).json({
         success: false,
         message: "Error while reset the password",
+      });
+    }
+  },
+  signWithEther: async function (req, res) {
+    try {
+      if (!req.body.message) {
+        res
+          .status(422)
+          .json({ message: "Expected prepareMessage object as body." });
+        return;
+      }
+
+      let message = new SiweMessage(req.body.message);
+      const fields = await message.validate(req.body.signature);
+      const visitors = await VisitorCreate();
+      console.log("visitors", visitors);
+      req.session.siwe = fields;
+      req.session.cookie.expires = new Date(fields.expirationTime);
+      req.session.save(() => res.status(200).end());
+    } catch (e) {
+      req.session.siwe = null;
+      req.session.nonce = null;
+      console.error(e);
+      switch (e) {
+        case ErrorTypes.EXPIRED_MESSAGE: {
+          req.session.save(() => res.status(440).json({ message: e.message }));
+          break;
+        }
+        case ErrorTypes.INVALID_SIGNATURE: {
+          req.session.save(() => res.status(422).json({ message: e.message }));
+          break;
+        }
+        default: {
+          req.session.save(() => res.status(500).json({ message: e.message }));
+          break;
+        }
+      }
+    }
+  },
+  nonce: async function (req, res) {
+    req.session.nonce = generateNonce();
+    return res.status(200).json({
+      success: true,
+      message: req.session.nonce,
+    });
+  },
+
+  getPersonalAddress: async function (req, res) {
+    if (!req.session.siwe) {
+      res.status(401).json({ message: "You have to first sign_in" });
+      return;
+    }
+    console.log("User is authenticated!");
+    res.setHeader("Content-Type", "text/plain");
+    res.send(
+      `You are authenticated and your address is: ${req.session.siwe.address}`
+    );
+  },
+
+  getAllVisitors: async (req, res) => {
+    try {
+      const visitHistory = await GetAllVisitor(req);
+
+      res.status(200).json({
+        status: "success",
+        visitHistory,
+      });
+    } catch (err) {
+      return res.status(400).json({
+        error: {
+          msg: err.message,
+        },
       });
     }
   },

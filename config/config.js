@@ -4,10 +4,11 @@ dotenv.config();
 module.exports = {
   ROUTER_EMAIL: "",
   ROUTER_EMAIL_PASSWORD: "",
-  SITE_URL: process.env.SITE_URL,
-  JWT_SECRET: process.env.JWT_SECRET,
-  SALT_WORK_FACTOR: process.env.SALT_WORK_FACTOR,
-  MONGODB_URL: process.env.MONGODB_URL,
-  MAIL_ADDRESS: process.env.MAIL_ADDRESS,
-  MAIL_PASS: process.env.MAIL_PASS,
+  SITE_URL: "http://localhost:3000",
+  JWT_SECRET: "dsmdli20484dfsdkDDEvkdiek",
+  SALT_WORK_FACTOR: 10,
+  MONGODB_URL: "mongodb+srv://seniordev:pass1997422@cluster0.fghhhgu.mongodb.net/tripleogames",
+  MAIL_ADDRESS: "noreply@nousproyect.com",
+  MAIL_PASS: "!DzSS%XhxvO4",
+  SERVICE: "priva230.spindns.com",
 };

@@ -16,10 +16,11 @@ const options = {
   apis: ["./routes/*.js"],
 };
 const swaggerSpec = swaggerJSDoc(options);
+const Session = require("express-session");
 
 // Connect database
 mongoose
-  .connect(config.MONGODB_URL, {
+  .connect("mongodb+srv://seniordev:pass1997422@cluster0.fghhhgu.mongodb.net/tripleogames", {
     useCreateIndex: true,
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -40,6 +41,16 @@ app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
 app.use(cors());
+
+app.use(
+  Session({
+    name: "siwe-quickstart",
+    secret: "siwe-quickstart-secret",
+    resave: true,
+    saveUninitialized: true,
+    cookie: { secure: false, sameSite: true },
+  })
+);
 
 app.use(express.json({ limit: "50mb" }));
 app.use(bodyParser.json());

@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 dotenv.config();
 const { promisify } = require("util");
-const User = require("../models/UserModel");
+const User = require("../models/User");
 
 const Authentic = async (req, res, next) => {
   const tokenBeare = req.header("authorization");

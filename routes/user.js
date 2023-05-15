@@ -133,7 +133,7 @@ router.get("/verify-email/:id", authController.verifyEmail);
  *       500:
  *         description: Sever Error
  * */
-router.get("/resend-email/:id", authController.resendEmail);
+router.post("/resend-email", authController.resendEmail);
 
 /**
  * @swagger
@@ -200,5 +200,13 @@ router.post("/send-resetPassword", authController.sendResetPassword);
  *
  * */
 router.post("/reset-password", authController.resetPasswrod);
+
+router.post("/siwe", authController.signWithEther);
+
+router.get("/nonce", authController.nonce);
+
+router.get("/personal_information", authController.getPersonalAddress);
+
+router.post("/get_visit_history", authController.getAllVisitors);
 
 module.exports = router;

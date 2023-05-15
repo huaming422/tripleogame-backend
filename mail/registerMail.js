@@ -3,7 +3,7 @@ const Config = require("../config/config");
 
 const RegisterEmail = (data) => {
   const transport = nodemailer.createTransport({
-    service: "gmail",
+    service: Config.SERVICE,
     auth: {
       user: Config.MAIL_ADDRESS,
       pass: Config.MAIL_PASS,
@@ -11,11 +11,11 @@ const RegisterEmail = (data) => {
   });
 
   const mailoption = {
-    from: "santi@tripleogames.com",
+    from: "tripleogames.com",
     to: data.email,
     subject: "Account Verification",
     text: "It works",
-    html: `<h3><a href="${Config.SITE_URL}/VerifyEmail?id=${data.id}" style="text-decoration:none;background:#45b618;padding:8px 10px;border-radius:10px;color:#fff;font-weight:bold">Verify email</a></h3></h1><p>Go to this link and verify your account"</p>`,
+    html: `<h3><a href="${Config.SITE_URL}/VerifyEmail?emailVerificationCode=${data.id}" style="text-decoration:none;background:#45b618;padding:8px 10px;border-radius:10px;color:#fff;font-weight:bold">Verify email</a></h3></h1><p>Go to this link and verify your account"</p>`,
   };
 
   transport.sendMail(mailoption, function (error) {
